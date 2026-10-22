@@ -1,0 +1,11 @@
+{
+  "name": "proxispeak",
+  "version": "1.0.0",
+  "description": "ProxiSpeak: Geospatial Proximity Audio Ecosystem",
+  "scripts": {
+    "server": "npm run start --prefix server",
+    "server:dev": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "benchmark": "npm run benchmark --prefix server"
+  }
+}
