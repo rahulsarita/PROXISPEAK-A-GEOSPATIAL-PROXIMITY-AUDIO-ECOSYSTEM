@@ -7,7 +7,7 @@ export async function connectDB() {
     await mongoose.connect(config.mongoUri, {
       serverSelectionTimeoutMS: 5000,
     });
-    console.log(`[MongoDB] Connected successfully to ${config.mongoUri}`);
+    console.log(`[MongoDB] Connected successfully.`);
 
     // Ensure models are registered and indexes are created
     return mongoose.connection;
