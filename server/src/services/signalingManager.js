@@ -1,6 +1,7 @@
 import { spatialEngine } from './spatialEngine.js';
 import { redisPubSub } from './redisPubSub.js';
 import OfficeMap from '../models/OfficeMap.js';
+import config from '../config.js';
 
 export class SignalingManager {
   constructor(io) {
@@ -11,6 +12,7 @@ export class SignalingManager {
     this.socketToUser = new Map();
     // Map of userId -> socketId
     this.userToSocket = new Map();
+    this.lastSpatialUpdate = new Map();
     // Cache of active office maps by roomId
     this.mapCache = new Map();
   }
@@ -123,26 +125,34 @@ export class SignalingManager {
     });
 
     // 2. Movement broadcast & proximity calculation
-    socket.on('move', async (data) => {
+    socket.on('move', async (data = {}) => {
       const userId = this.socketToUser.get(socket.id);
       if (!userId) return;
 
       const { x, y, facingAngle, roomId = 'default-office' } = data;
       const cached = spatialEngine.activeUserLocations.get(userId);
       const earshotRadius = data.earshotRadius || (cached ? cached.earshotRadius : 160);
+      const now = Date.now();
+      const lastUpdate = this.lastSpatialUpdate.get(userId) || 0;
+      const shouldPersistSpatialState = now - lastUpdate >= config.spatialQueryThrottleMs;
 
-      // Update in spatialEngine
-      await spatialEngine.updateUserPosition(userId, socket.id, {
+      if (shouldPersistSpatialState) {
+        this.lastSpatialUpdate.set(userId, now);
+      }
+
+      // Keep movement current in memory, but limit database writes to reduce load.
+      const positionUpdate = spatialEngine.updateUserPosition(userId, socket.id, {
         x,
         y,
         facingAngle,
-        name: cached ? cached.name : 'User',
-        color: cached ? cached.color : '#3B82F6',
+        name: data.name || (cached ? cached.name : 'User'),
+        color: data.color || (cached ? cached.color : '#3B82F6'),
         isSpeaking: cached ? cached.isSpeaking : false,
         isMuted: cached ? cached.isMuted : false,
         roomId,
         earshotRadius,
         isBot: cached ? cached.isBot : false,
+        persist: shouldPersistSpatialState,
       });
 
       // Broadcast coordinate update to room at high frequency for smooth Canvas animation
@@ -153,9 +163,16 @@ export class SignalingManager {
         facingAngle,
       });
 
-      // Recalculate proximity earshot graph
-      const officeMap = await this.getMapForRoom(roomId);
-      await this.evaluateProximity(userId, roomId, officeMap);
+      try {
+        await positionUpdate;
+        if (!shouldPersistSpatialState) return;
+
+        // Recalculate proximity earshot graph
+        const officeMap = await this.getMapForRoom(roomId);
+        await this.evaluateProximity(userId, roomId, officeMap);
+      } catch (err) {
+        console.error('[Signaling] Move update failed:', err);
+      }
     });
 
     // 3. Selective WebRTC Signaling Handshake
@@ -316,6 +333,7 @@ export class SignalingManager {
       this.userEarshotMap.delete(userId);
       this.socketToUser.delete(socket.id);
       this.userToSocket.delete(userId);
+      this.lastSpatialUpdate.delete(userId);
 
       await spatialEngine.removeUser(userId);
       this.io.to(roomId).emit('user-left', { userId });

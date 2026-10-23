@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, Activity, Map, Radio, Users, Settings, Cpu, ShieldCheck, LayoutDashboard, Compass } from 'lucide-react';
+import { Volume2, Activity, Map, Radio, Users, Settings, Cpu, LayoutDashboard, Compass } from 'lucide-react';
 
 export function TopNavigation({
   socketConnected,

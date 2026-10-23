@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, Bot, Trash2, Sliders, Navigation, UserPlus } from 'lucide-react';
 
 export function ControlBar({

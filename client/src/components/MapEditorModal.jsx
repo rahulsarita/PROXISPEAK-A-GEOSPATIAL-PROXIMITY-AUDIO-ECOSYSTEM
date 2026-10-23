@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
-import { Map, X, Plus, Trash2, Save, RotateCcw, Box, Shield, Coffee, Users } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Map, X, Trash2, Save, RotateCcw, Box, Shield, Coffee, Users } from 'lucide-react';
 import config from '../config.js';
 
 export function MapEditorModal({ isOpen, onClose, officeMap, onUpdateMap }) {
   const [obstacles, setObstacles] = useState(officeMap?.obstacles || []);
-  const [selectedType, setSelectedType] = useState('wall');
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setObstacles(officeMap?.obstacles || []);
+    }
+  }, [isOpen, officeMap]);
 
   if (!isOpen) return null;
 

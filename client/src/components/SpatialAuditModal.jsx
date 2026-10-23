@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, X, Play, CheckCircle2, AlertTriangle, Clock, Layers, BarChart3, RefreshCw } from 'lucide-react';
+import { Cpu, X, Play, CheckCircle2, AlertTriangle, Clock, BarChart3, RefreshCw } from 'lucide-react';
 import config from '../config.js';
 
 export function SpatialAuditModal({ isOpen, onClose }) {

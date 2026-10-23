@@ -15,13 +15,13 @@ async function startServer() {
   const server = http.createServer(app);
 
   // Middlewares
-  app.use(cors({ origin: '*', credentials: true }));
+  app.use(cors({ origin: '*' }));
   app.use(express.json());
 
   // Connect to MongoDB
   await connectDB();
-  // Ensure schema indexes
-  await UserSession.syncIndexes();
+  // Add indexes declared by the schema without dropping existing production indexes.
+  await UserSession.createIndexes();
 
   // Initialize Redis Pub/Sub (with in-memory fallback)
   await redisPubSub.initialize();

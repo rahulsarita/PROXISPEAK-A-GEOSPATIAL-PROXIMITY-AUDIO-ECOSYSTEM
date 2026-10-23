@@ -53,6 +53,21 @@ export function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [isTestAudioActive, setIsTestAudioActive] = useState(false);
   const [speakingLevel, setSpeakingLevel] = useState(0);
+  const currentUserRef = useRef(currentUser);
+  const isMutedRef = useRef(isMuted);
+  const isTestAudioActiveRef = useRef(isTestAudioActive);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
+
+  useEffect(() => {
+    isTestAudioActiveRef.current = isTestAudioActive;
+  }, [isTestAudioActive]);
 
   // Modals & Drawers
   const [isAuditOpen, setIsAuditOpen] = useState(false);
@@ -73,7 +88,7 @@ export function App() {
 
     const pcm = new PeerConnectionManager(socket);
     pcm.setCallback((peerId, state) => {
-      setPeerConnectionStates((prev) => new Map(prev.set(peerId, state)));
+      setPeerConnectionStates((prev) => new Map(prev).set(peerId, state));
     });
     pcmRef.current = pcm;
 
@@ -163,13 +178,16 @@ export function App() {
       const level = audioManager.getLocalSpeakingLevel();
       setSpeakingLevel(level);
 
-      const currentlySpeaking = level > 0.05 || isTestAudioActive;
-      if (currentlySpeaking !== currentUser.isSpeaking) {
-        setCurrentUser((prev) => ({ ...prev, isSpeaking: currentlySpeaking }));
+      const user = currentUserRef.current;
+      const currentlySpeaking = level > 0.05 || isTestAudioActiveRef.current;
+      if (currentlySpeaking !== user.isSpeaking) {
+        const updatedUser = { ...user, isSpeaking: currentlySpeaking };
+        currentUserRef.current = updatedUser;
+        setCurrentUser(updatedUser);
         socket.emit('voice-status', {
           isSpeaking: currentlySpeaking,
-          isMuted,
-          roomId: currentUser.roomId,
+          isMuted: isMutedRef.current,
+          roomId: user.roomId,
         });
       }
     }, 150);
@@ -211,13 +229,17 @@ export function App() {
 
   // Broadcast movement to socket
   const handleLocalMove = (pos) => {
-    if (socketRef.current && socketConnected) {
+    const updatedUser = { ...currentUserRef.current, ...pos };
+    currentUserRef.current = updatedUser;
+    setCurrentUser(updatedUser);
+
+    if (socketRef.current?.connected) {
       socketRef.current.emit('move', {
         x: pos.x,
         y: pos.y,
         facingAngle: pos.facingAngle,
-        earshotRadius: currentUser.earshotRadius,
-        roomId: currentUser.roomId,
+        earshotRadius: updatedUser.earshotRadius,
+        roomId: updatedUser.roomId,
       });
     }
   };
@@ -228,8 +250,11 @@ export function App() {
       await audioManager.startMicrophone();
     }
     const newMuted = audioManager.toggleMute();
+    isMutedRef.current = newMuted;
     setIsMuted(newMuted);
-    setCurrentUser((prev) => ({ ...prev, isMuted: newMuted }));
+    const updatedUser = { ...currentUserRef.current, isMuted: newMuted };
+    currentUserRef.current = updatedUser;
+    setCurrentUser(updatedUser);
 
     if (socketRef.current) {
       socketRef.current.emit('voice-status', {
@@ -243,8 +268,11 @@ export function App() {
   // Toggle Synthetic Voice Test Audio
   const handleToggleTestAudio = () => {
     const active = audioManager.toggleTestAudio();
+    isTestAudioActiveRef.current = active;
     setIsTestAudioActive(active);
-    setCurrentUser((prev) => ({ ...prev, isSpeaking: active }));
+    const updatedUser = { ...currentUserRef.current, isSpeaking: active };
+    currentUserRef.current = updatedUser;
+    setCurrentUser(updatedUser);
 
     if (socketRef.current) {
       socketRef.current.emit('voice-status', {
@@ -257,11 +285,13 @@ export function App() {
 
   // Change Earshot Radius
   const handleChangeEarshot = (radius) => {
-    setCurrentUser((prev) => ({ ...prev, earshotRadius: radius }));
+    const updatedUser = { ...currentUserRef.current, earshotRadius: radius };
+    currentUserRef.current = updatedUser;
+    setCurrentUser(updatedUser);
     handleLocalMove({
-      x: currentUser.x,
-      y: currentUser.y,
-      facingAngle: currentUser.facingAngle,
+      x: updatedUser.x,
+      y: updatedUser.y,
+      facingAngle: updatedUser.facingAngle,
     });
   };
 

@@ -35,7 +35,23 @@ export class SpatialEngine {
   /**
    * Update a user's location in memory and in MongoDB.
    */
-  async updateUserPosition(userId, socketId, { x, y, facingAngle, name, color, isSpeaking, isMuted, roomId = 'default-office', earshotRadius = 160, isBot = false }) {
+  async updateUserPosition(
+    userId,
+    socketId,
+    {
+      x,
+      y,
+      facingAngle,
+      name,
+      color,
+      isSpeaking,
+      isMuted,
+      roomId = 'default-office',
+      earshotRadius = 160,
+      isBot = false,
+      persist = true,
+    }
+  ) {
     this.activeUserLocations.set(userId, {
       userId,
       socketId,
@@ -52,8 +68,12 @@ export class SpatialEngine {
       updatedAt: Date.now(),
     });
 
+    if (!persist) {
+      return this.activeUserLocations.get(userId);
+    }
+
     // Upsert into MongoDB with 2D coordinates [x, y]
-    return await UserSession.findOneAndUpdate(
+    return UserSession.findOneAndUpdate(
       { userId },
       {
         userId,

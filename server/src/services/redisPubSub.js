@@ -31,7 +31,7 @@ class RedisPubSubService extends EventEmitter {
 
       await Promise.all([this.pubClient.connect(), this.subClient.connect()]);
       this.isConnected = true;
-      console.log(`[Redis] Connected successfully to ${config.redisUrl} for horizontal scaling.`);
+      console.log('[Redis] Connected successfully for horizontal scaling.');
 
       await this.subClient.subscribe('proxispeak:spatial-events', 'proxispeak:signaling');
       this.subClient.on('message', (channel, message) => {
@@ -44,7 +44,7 @@ class RedisPubSubService extends EventEmitter {
       });
     } catch (err) {
       this.isConnected = false;
-      console.warn(`[Redis] Optional Redis not available at ${config.redisUrl}. Operating in high-performance in-memory pub/sub mode.`);
+      console.warn('[Redis] Optional service unavailable. Operating in in-memory pub/sub mode.');
     }
   }
 

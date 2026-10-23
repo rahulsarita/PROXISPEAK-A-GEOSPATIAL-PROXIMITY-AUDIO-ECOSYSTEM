@@ -88,9 +88,12 @@ export function OfficeCanvas({
         );
 
         if (updatedPos.moved) {
-          currentLocal.x = updatedPos.x;
-          currentLocal.y = updatedPos.y;
-          currentLocal.facingAngle = updatedPos.facingAngle;
+          localPlayerRef.current = {
+            ...currentLocal,
+            x: updatedPos.x,
+            y: updatedPos.y,
+            facingAngle: updatedPos.facingAngle,
+          };
         }
 
         // 2. Real-time Web Audio API Spatial Parameters update
