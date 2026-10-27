@@ -1,14 +1,18 @@
 @echo off
+cd /d "%~dp0"
 echo ===================================================
 echo   Installing ProxiSpeak Dependencies...
 echo ===================================================
 
-echo [1/2] Installing Server Dependencies...
+echo [1/3] Installing Root Dependencies...
+call npm install
+
+echo [2/3] Installing Server Dependencies...
 cd server
 call npm install
 cd ..
 
-echo [2/2] Installing Client Dependencies...
+echo [3/3] Installing Client Dependencies...
 cd client
 call npm install
 cd ..

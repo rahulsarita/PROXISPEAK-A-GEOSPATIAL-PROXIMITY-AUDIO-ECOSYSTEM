@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "ProxiSpeak: Geospatial Proximity Audio Ecosystem",
   "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
     "server": "npm run start --prefix server",
     "server:dev": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
     "benchmark": "npm run benchmark --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
   }
 }
