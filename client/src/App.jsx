@@ -12,8 +12,10 @@ import SpatialAuditModal from './components/SpatialAuditModal.jsx';
 import MapEditorModal from './components/MapEditorModal.jsx';
 import UserProfileModal from './components/UserProfileModal.jsx';
 import DashboardView from './components/DashboardView.jsx';
+import LoginPage from './components/LoginPage.jsx';
 
 export function App() {
+  const [hasEntered, setHasEntered] = useState(false);
   // Navigation View Tab: 'map' or 'dashboard'
   const [activeTab, setActiveTab] = useState('map');
 
@@ -80,6 +82,7 @@ export function App() {
 
   // Initialize Socket.io and WebRTC Peer Connection Manager
   useEffect(() => {
+    if (!hasEntered) return undefined;
     const socket = io(config.SERVER_URL, {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
@@ -225,7 +228,7 @@ export function App() {
       pcm.cleanup();
       socket.disconnect();
     };
-  }, []);
+  }, [hasEntered]);
 
   // Broadcast movement to socket
   const handleLocalMove = (pos) => {
@@ -326,6 +329,17 @@ export function App() {
       });
     }
   };
+
+  const handleContinueToWorkspace = (email) => {
+    const displayName = (email || "").split("@")[0].replace(/[._-]+/g, " ").trim() || "Guest";
+    const updatedUser = { ...currentUserRef.current, name: displayName };
+    currentUserRef.current = updatedUser;
+    setCurrentUser(updatedUser);
+    localStorage.setItem("proxispeak_name", displayName);
+    setHasEntered(true);
+  };
+
+  if (!hasEntered) return <LoginPage onContinue={handleContinueToWorkspace} />;
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-slate-950">
