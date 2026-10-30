@@ -14,6 +14,7 @@ import {
   Volume2,
 } from 'lucide-react';
 import config from '../config.js';
+import './DashboardView.css';
 
 export function DashboardView({
   peers = [],
@@ -82,18 +83,18 @@ export function DashboardView({
   });
 
   return (
-    <div className="absolute inset-0 z-20 pt-20 pb-8 px-6 overflow-y-auto bg-slate-950/95 backdrop-blur-md text-slate-100 pointer-events-auto">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="dashboard-view absolute inset-0 z-20 pt-20 pb-8 px-6 overflow-y-auto bg-slate-950/95 backdrop-blur-md text-slate-100 pointer-events-auto">
+      <div className="dashboard-container max-w-6xl mx-auto space-y-6">
         {/* Dashboard Header Banner */}
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
+        <div className="dashboard-hero glass-panel p-6 rounded-3xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="dashboard-hero__copy">
             <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-              <h2 className="text-xl font-extrabold text-white tracking-tight">
+              <span className="dashboard-live-dot w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+              <h2 className="dashboard-title text-xl font-extrabold text-white tracking-tight">
                 Infotact Telemetry & Spatial Audio Dashboard
               </h2>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="dashboard-subtitle text-xs text-slate-400">
               Live system overview: MongoDB geospatial engine, WebRTC mesh efficiency, and office occupancy.
             </p>
           </div>
@@ -101,7 +102,7 @@ export function DashboardView({
           <div className="flex items-center gap-3">
             <button
               onClick={onSwitchToMap}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 flex items-center gap-2 transition-all"
+              className="dashboard-map-button bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 flex items-center gap-2 transition-all"
             >
               <span>Back to 2D Virtual Office</span>
               <ArrowRight className="w-4 h-4" />
@@ -110,9 +111,9 @@ export function DashboardView({
         </div>
 
         {/* Top 4 KPI Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="dashboard-metrics grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Active Coworkers */}
-          <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
+          <div className="dashboard-metric dashboard-metric--users glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
             <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
               <span>Active Coworkers</span>
               <Users className="w-4 h-4 text-blue-400" />
@@ -130,7 +131,7 @@ export function DashboardView({
           </div>
 
           {/* Mesh Efficiency & Bandwidth Savings */}
-          <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
+          <div className="dashboard-metric dashboard-metric--mesh glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
             <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
               <span>Mesh Optimization</span>
               <TrendingDown className="w-4 h-4 text-emerald-400" />
@@ -147,7 +148,7 @@ export function DashboardView({
           </div>
 
           {/* Geospatial Query Latency */}
-          <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
+          <div className="dashboard-metric dashboard-metric--latency glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
             <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
               <span>MongoDB $near Latency</span>
               <Cpu className="w-4 h-4 text-cyan-400" />
@@ -165,7 +166,7 @@ export function DashboardView({
           </div>
 
           {/* Earshot Range & Audio Mode */}
-          <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
+          <div className="dashboard-metric dashboard-metric--audio glass-panel p-4 rounded-2xl border border-white/10 space-y-2">
             <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
               <span>Acoustic Earshot</span>
               <Radio className="w-4 h-4 text-purple-400" />
@@ -184,9 +185,9 @@ export function DashboardView({
         </div>
 
         {/* Middle Two-Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="dashboard-insights grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Column 1: Office Zone Occupancy */}
-          <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
+          <div className="dashboard-panel dashboard-panel--zones glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-cyan-400" />
@@ -201,7 +202,7 @@ export function DashboardView({
                 return (
                   <div
                     key={zone.id}
-                    className="p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-1.5"
+                    className="dashboard-zone p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-1.5"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-slate-200">{zone.name}</span>
@@ -210,9 +211,9 @@ export function DashboardView({
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div className="dashboard-zone__track w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="bg-cyan-500 h-1.5 rounded-full transition-all duration-300"
+                        className="dashboard-zone__fill bg-cyan-500 h-1.5 rounded-full transition-all duration-300"
                         style={{ width: `${percent}%` }}
                       />
                     </div>
@@ -236,7 +237,7 @@ export function DashboardView({
           </div>
 
           {/* Column 2: WebRTC Mesh Scaling Architecture Comparison */}
-          <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
+          <div className="dashboard-panel dashboard-panel--mesh glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-400" />
@@ -249,7 +250,7 @@ export function DashboardView({
 
             <div className="space-y-3 text-xs">
               {/* Conventional Zoom / Full Mesh */}
-              <div className="p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-2">
+              <div className="dashboard-mesh-card dashboard-mesh-card--full p-3.5 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-rose-300">
                     Conventional WebRTC Full Mesh [O(N²)]
@@ -266,7 +267,7 @@ export function DashboardView({
               </div>
 
               {/* ProxiSpeak Selective Mesh */}
-              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+              <div className="dashboard-mesh-card dashboard-mesh-card--selective p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-emerald-300">
                     ProxiSpeak Geospatial Selective Mesh [O(k)]
@@ -286,7 +287,7 @@ export function DashboardView({
               </div>
 
               {/* Quick Actions Bar */}
-              <div className="pt-2 flex flex-wrap items-center gap-2">
+              <div className="dashboard-actions pt-2 flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => onSpawnBots(10)}
                   className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
@@ -317,7 +318,7 @@ export function DashboardView({
         </div>
 
         {/* Active Audio Nodes Table */}
-        <div className="glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
+        <div className="dashboard-panel dashboard-panel--streams glass-panel p-5 rounded-3xl border border-white/10 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-purple-400" />
@@ -334,8 +335,8 @@ export function DashboardView({
               Walk over to colleagues on the map or spawn bots to see live audio matrices.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-mono text-xs">
+            <div className="dashboard-table-wrap overflow-x-auto">
+              <table className="dashboard-table w-full text-left font-mono text-xs">
                 <thead>
                   <tr className="border-b border-white/10 text-slate-400 text-[11px]">
                     <th className="py-2">Colleague</th>

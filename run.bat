@@ -24,20 +24,27 @@ if defined FRONTEND_BUSY if defined BACKEND_BUSY (
   exit /b 0
 )
 
-if defined FRONTEND_BUSY goto PortConflict
-if defined BACKEND_BUSY goto PortConflict
+if defined FRONTEND_BUSY goto StartBackendOnly
+if defined BACKEND_BUSY goto StartFrontendOnly
 
 start "ProxiSpeak Ecosystem" /D "%~dp0" cmd /k "npm run dev"
+goto OpenApp
+
+:StartBackendOnly
+echo Frontend is already running. Starting the backend only.
+start "ProxiSpeak Backend" /D "%~dp0" cmd /k "npm run server:dev"
+goto OpenApp
+
+:StartFrontendOnly
+echo Backend is already running. Starting the frontend only.
+start "ProxiSpeak Frontend" /D "%~dp0" cmd /k "npm run client"
+
+:OpenApp
 timeout /t 5 /nobreak >nul
 start "" "http://localhost:3000"
 exit /b 0
 
 :MissingDependencies
 echo Dependencies are missing. Run install.bat first, then run this file again.
-pause
-exit /b 1
-
-:PortConflict
-echo Port 3000 or 5000 is already in use. Close the other app using that port and try again.
 pause
 exit /b 1
